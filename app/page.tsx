@@ -186,11 +186,18 @@ export default function HomePage() {
         body: JSON.stringify({ employeeId: employee.id }),
       });
 
+      // 5. Send fotocheck PDF via email (fire-and-forget, no blocking)
+      fetch("/api/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeId: employee.id }),
+      }).catch(() => console.error("Error al enviar correo"));
+
       setSubmitted(true);
       toast.success(
         dniExists
-          ? "Datos actualizados y nuevo fotocheck generado"
-          : "Datos registrados y fotocheck generado"
+          ? "Datos actualizados y nuevo fotocheck generado. Se envió el PDF a su correo."
+          : "Datos registrados y fotocheck generado. Se envió el PDF a su correo."
       );
     } catch (error) {
       toast.error(
@@ -238,8 +245,8 @@ export default function HomePage() {
               </h2>
               <p className="text-muted-foreground mb-6">
                 {dniExists
-                  ? "Tus datos y foto han sido actualizados correctamente. Se ha generado un nuevo fotocheck reemplazando el anterior."
-                  : "Tus datos y foto han sido enviados correctamente. Tu fotocheck será generado por la Oficina de Tecnologías de la Información."}
+                  ? "Tus datos y foto han sido actualizados correctamente. Se ha generado un nuevo fotocheck y se envió el PDF a tu correo electrónico."
+                  : "Tus datos y foto han sido enviados correctamente. Se ha generado tu fotocheck y se envió el PDF a tu correo electrónico."}
               </p>
               <Button
                 onClick={() => {
