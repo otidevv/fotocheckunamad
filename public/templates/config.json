@@ -1,0 +1,36 @@
+{
+  "template": "carnet-template.png",
+  "templateBack": "traseratrabajadores.png",
+  "cardWidth": 1620,
+  "cardHeight": 2580,
+  "front": {
+    "photoCircle": {
+      "cx": 810,
+      "cy": 1020,
+      "radius": 550
+    },
+    "photo": {
+      "x": "center",
+      "y": 580,
+      "width": 680,
+      "height": 816
+    },
+    "fields": {
+      "fullName": { "x": "center", "y": 1700, "fontSize": 95, "fontWeight": "bold", "color": "#db0455", "maxWidth": 1300 },
+      "position": { "x": "center", "y": 1720, "fontSize": 55, "fontWeight": "bold", "color": "#000000", "maxWidth": 1300 },
+      "dni": { "x": "center", "y": 1860, "fontSize": 80, "fontWeight": "bold", "color": "#000000", "maxWidth": 1300 }
+    }
+  },
+  "back": {
+    "fields": {
+      "email": { "x": "center", "y": 1150, "fontSize": 38, "color": "#FFFFFF", "maxWidth": 1300 },
+      "validity": { "x": "center", "y": 1250, "fontSize": 38, "fontWeight": "bold", "color": "#FFFFFF", "maxWidth": 1300, "text": "Vigencia: 2026" },
+      "address": { "x": "center", "y": 1340, "fontSize": 32, "color": "#FFFFFF", "maxWidth": 1300, "text": "Av. Jorge Chávez 1160 - Puerto Maldonado" }
+    },
+    "qr": {
+      "x": "center",
+      "y": 650,
+      "size": 380
+    }
+  }
+}
