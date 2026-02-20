@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import PhotoUpload from "@/components/PhotoUpload";
 import CarnetPreview from "@/components/CarnetPreview";
 import { POSITIONS } from "@/lib/constants";
-import { Send, Loader2, CreditCard, CheckCircle2, Search, Check, ChevronsUpDown, AlertTriangle } from "lucide-react";
+import Image from "next/image";
+import { Send, Loader2, CheckCircle2, Search, Check, ChevronsUpDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -206,16 +207,27 @@ export default function HomePage() {
   // Success screen
   if (submitted) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative overflow-hidden">
+        <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+          <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-brand/5 blur-3xl" />
+          <div className="absolute top-1/3 -left-32 w-80 h-80 rounded-full bg-accent/5 blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-64 h-64 rounded-full bg-brand-light/5 blur-3xl" />
+        </div>
         <header className="bg-brand-dark text-white px-6 py-3">
           <div className="max-w-6xl mx-auto flex items-center gap-3">
-            <CreditCard className="w-5 h-5 text-brand-light" />
+            <Image src="/logo/logo.png" alt="UNAMAD" width={48} height={48} />
             <span className="font-bold text-sm">
               CARNET DE PERSONAL UNAMAD 2026
             </span>
           </div>
         </header>
-        <div className="flex items-center justify-center min-h-[80vh]">
+        <div className="relative -mb-px">
+          <svg className="w-full block" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: "60px" }}>
+            <path d="M0,0 L1440,0 L1440,60 Q1080,120 720,60 Q360,0 0,60 Z" fill="#312e81" />
+            <path d="M0,0 L1440,0 L1440,40 Q1080,100 720,40 Q360,-20 0,40 Z" fill="#1e1b4b" opacity="0.3" />
+          </svg>
+        </div>
+        <div className="flex items-center justify-center min-h-[80vh] relative">
           <Card className="max-w-md w-full mx-4">
             <CardContent className="p-8 text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -249,18 +261,38 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Decorative background elements */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-brand/5 blur-3xl" />
+        <div className="absolute top-1/3 -left-32 w-80 h-80 rounded-full bg-accent/5 blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-64 h-64 rounded-full bg-brand-light/5 blur-3xl" />
+        <svg className="absolute top-0 left-0 w-full opacity-[0.03]" viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <circle cx="200" cy="150" r="80" fill="#4338ca" />
+          <circle cx="800" cy="100" r="120" fill="#6366f1" />
+          <circle cx="1200" cy="200" r="60" fill="#818cf8" />
+        </svg>
+      </div>
+
       {/* Header */}
-      <header className="bg-brand-dark text-white px-6 py-3 shadow-md">
+      <header className="bg-brand-dark text-white px-6 py-3 shadow-md relative">
         <div className="max-w-6xl mx-auto flex items-center gap-3">
-          <CreditCard className="w-5 h-5 text-brand-light" />
+          <Image src="/logo/logo.png" alt="UNAMAD" width={48} height={48} />
           <span className="font-bold text-sm tracking-wide">
             CARNET DE PERSONAL UNAMAD 2026
           </span>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      {/* Wave after header */}
+      <div className="relative -mb-px">
+        <svg className="w-full block" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: "60px" }}>
+          <path d="M0,0 L1440,0 L1440,60 Q1080,120 720,60 Q360,0 0,60 Z" fill="#312e81" />
+          <path d="M0,0 L1440,0 L1440,40 Q1080,100 720,40 Q360,-20 0,40 Z" fill="#1e1b4b" opacity="0.3" />
+        </svg>
+      </div>
+
+      <main className="max-w-6xl mx-auto px-4 py-8 relative">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* LEFT: Form */}
           <div className="flex-1">
@@ -544,9 +576,17 @@ export default function HomePage() {
         </div>
       </main>
 
+      {/* Wave before footer */}
+      <div className="relative mt-8">
+        <svg className="w-full block" viewBox="0 0 1440 120" preserveAspectRatio="none" style={{ height: "60px" }}>
+          <path d="M0,120 L0,60 Q360,0 720,60 Q1080,120 1440,60 L1440,120 Z" fill="#312e81" />
+          <path d="M0,120 L0,80 Q360,20 720,80 Q1080,140 1440,80 L1440,120 Z" fill="#1e1b4b" opacity="0.3" />
+        </svg>
+      </div>
+
       {/* Footer */}
-      <footer className="border-t py-4 px-6 mt-8">
-        <p className="text-center text-xs text-muted-foreground">
+      <footer className="bg-brand-dark text-white py-4 px-6">
+        <p className="text-center text-xs opacity-80">
           Universidad Nacional Amazónica de Madre de Dios - Oficina de
           Tecnologías de la Información &copy; 2026
         </p>

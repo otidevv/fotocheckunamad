@@ -6,6 +6,10 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") || "";
   const status = searchParams.get("status") || "";
+  const cardGenerated = searchParams.get("cardGenerated") || "";
+  const dateFrom = searchParams.get("dateFrom") || "";
+  const dateTo = searchParams.get("dateTo") || "";
+  const orderBy = searchParams.get("orderBy") || "newest";
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "20");
 
@@ -23,10 +27,29 @@ export async function GET(req: NextRequest) {
     where.status = status;
   }
 
+  if (cardGenerated === "true") {
+    where.cardGenerated = true;
+  } else if (cardGenerated === "false") {
+    where.cardGenerated = false;
+  }
+
+  if (dateFrom || dateTo) {
+    const createdAtFilter: Record<string, Date> = {};
+    if (dateFrom) {
+      createdAtFilter.gte = new Date(dateFrom);
+    }
+    if (dateTo) {
+      const end = new Date(dateTo);
+      end.setHours(23, 59, 59, 999);
+      createdAtFilter.lte = end;
+    }
+    where.createdAt = createdAtFilter;
+  }
+
   const [employees, total] = await Promise.all([
     prisma.employee.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: orderBy === "oldest" ? "asc" : "desc" },
       skip: (page - 1) * limit,
       take: limit,
     }),
