@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "Fotocheck UNAMAD - Sistema de Carnets",
   description:
     "Sistema de generación de fotocheck para personal administrativo - Universidad Nacional Amazónica de Madre de Dios",
+  icons: {
+    icon: "/logo/logo.png",
+  },
 };
 
 export default function RootLayout({
