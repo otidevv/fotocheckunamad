@@ -9,7 +9,7 @@ export const employeeSchema = z.object({
   firstName: z.string().min(2, "Nombres es requerido").transform((v) => v.toUpperCase()),
   lastName: z.string().min(2, "Apellidos es requerido").transform((v) => v.toUpperCase()),
   position: z.string().min(1, "Cargo es requerido"),
-  oficina: z.string().min(1, "Oficina es requerida"),
+  oficina: z.string().optional().default(""),
 });
 
 export type EmployeeFormData = z.infer<typeof employeeSchema>;

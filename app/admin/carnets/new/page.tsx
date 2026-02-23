@@ -24,6 +24,7 @@ export default function NewCarnetPage() {
     position: "",
     customPosition: "",
     oficina: "",
+    customOficina: "",
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -53,10 +54,7 @@ export default function NewCarnetPage() {
       toast.error("Seleccione un cargo");
       return;
     }
-    if (!form.oficina) {
-      toast.error("Seleccione una oficina/dependencia");
-      return;
-    }
+    const finalOficina = form.oficina === "__otro__" ? form.customOficina : form.oficina;
     if (!photoFile) {
       toast.error("Debe subir una foto");
       return;
@@ -84,7 +82,7 @@ export default function NewCarnetPage() {
           firstName: form.firstName,
           lastName: form.lastName,
           position: finalPosition,
-          oficina: form.oficina,
+          oficina: finalOficina,
         }),
       });
       if (!empRes.ok) {
@@ -109,6 +107,7 @@ export default function NewCarnetPage() {
   };
 
   const finalPosition = form.position === "__otro__" ? form.customPosition : form.position;
+  const finalOficina = form.oficina === "__otro__" ? form.customOficina : form.oficina;
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -169,7 +168,7 @@ export default function NewCarnetPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>OFICINA / DEPENDENCIA *</Label>
+                  <Label>OFICINA / DEPENDENCIA</Label>
                   <Select value={form.oficina} onValueChange={(val) => setForm((prev) => ({ ...prev, oficina: val }))}>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar oficina..." />
@@ -178,8 +177,12 @@ export default function NewCarnetPage() {
                       {OFICINAS.map((ofi) => (
                         <SelectItem key={ofi} value={ofi}>{ofi}</SelectItem>
                       ))}
+                      <SelectItem value="__otro__">Otro (especificar)</SelectItem>
                     </SelectContent>
                   </Select>
+                  {form.oficina === "__otro__" && (
+                    <Input name="customOficina" value={form.customOficina} onChange={handleChange} placeholder="Escriba la oficina..." className="mt-2 uppercase" />
+                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -204,7 +207,7 @@ export default function NewCarnetPage() {
               lastName={form.lastName}
               dni={form.dni}
               position={finalPosition}
-              oficina={form.oficina}
+              oficina={finalOficina}
               email={form.email}
               photoUrl={photoPreview}
             />

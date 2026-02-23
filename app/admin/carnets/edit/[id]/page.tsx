@@ -19,7 +19,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "", oficina: "" });
+  const [form, setForm] = useState({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "", oficina: "", customOficina: "" });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
@@ -29,11 +29,13 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((emp) => {
         const isCustom = !(POSITIONS as readonly string[]).includes(emp.position);
+        const isCustomOficina = emp.oficina && !(OFICINAS as readonly string[]).includes(emp.oficina);
         setForm({
           email: emp.email, dni: emp.dni, firstName: emp.firstName, lastName: emp.lastName,
           position: isCustom ? "__otro__" : emp.position,
           customPosition: isCustom ? emp.position : "",
-          oficina: emp.oficina || "",
+          oficina: isCustomOficina ? "__otro__" : (emp.oficina || ""),
+          customOficina: isCustomOficina ? emp.oficina : "",
         });
         setExistingPhotoUrl(emp.photoUrl);
         setPhotoPreview(emp.photoUrl);
@@ -65,7 +67,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
       const res = await fetch(`/api/employees/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, dni: form.dni, firstName: form.firstName, lastName: form.lastName, position: finalPosition, oficina: form.oficina }),
+        body: JSON.stringify({ email: form.email, dni: form.dni, firstName: form.firstName, lastName: form.lastName, position: finalPosition, oficina: form.oficina === "__otro__" ? form.customOficina : form.oficina }),
       });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error); }
 
@@ -81,6 +83,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
   if (loading) return <div className="flex items-center justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
 
   const finalPosition = form.position === "__otro__" ? form.customPosition : form.position;
+  const finalOficina = form.oficina === "__otro__" ? form.customOficina : form.oficina;
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -133,13 +136,17 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label>OFICINA / DEPENDENCIA *</Label>
+                  <Label>OFICINA / DEPENDENCIA</Label>
                   <Select value={form.oficina} onValueChange={(v) => setForm((p) => ({ ...p, oficina: v }))}>
                     <SelectTrigger><SelectValue placeholder="Seleccionar oficina..." /></SelectTrigger>
                     <SelectContent>
                       {OFICINAS.map((ofi) => <SelectItem key={ofi} value={ofi}>{ofi}</SelectItem>)}
+                      <SelectItem value="__otro__">Otro (especificar)</SelectItem>
                     </SelectContent>
                   </Select>
+                  {form.oficina === "__otro__" && (
+                    <Input name="customOficina" value={form.customOficina} onChange={handleChange} placeholder="Escriba la oficina..." className="mt-2 uppercase" />
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>FOTO (opcional, para cambiar la actual)</Label>
@@ -155,7 +162,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
         </div>
         <div className="lg:w-[300px]">
           <div className="sticky top-6">
-            <CarnetPreview firstName={form.firstName} lastName={form.lastName} dni={form.dni} position={finalPosition} oficina={form.oficina} email={form.email} photoUrl={photoPreview} />
+            <CarnetPreview firstName={form.firstName} lastName={form.lastName} dni={form.dni} position={finalPosition} oficina={finalOficina} email={form.email} photoUrl={photoPreview} />
           </div>
         </div>
       </div>
