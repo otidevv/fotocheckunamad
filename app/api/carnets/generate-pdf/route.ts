@@ -39,6 +39,7 @@ type EmployeeData = {
   firstName: string;
   lastName: string;
   position: string;
+  oficina: string;
   photoUrl: string | null;
   photoOriginal: string | null;
 };
@@ -76,6 +77,7 @@ async function generateSide(
   const fieldValues: Record<string, string> = {
     fullName: `${employee.firstName} ${employee.lastName}`,
     position: employee.position,
+    oficina: employee.oficina || "",
     dni: `DNI: ${employee.dni}`,
     email: employee.email,
   };

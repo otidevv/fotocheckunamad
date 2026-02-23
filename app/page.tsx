@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { toast } from "sonner";
 import PhotoUpload from "@/components/PhotoUpload";
 import CarnetPreview from "@/components/CarnetPreview";
-import { POSITIONS } from "@/lib/constants";
+import { POSITIONS, OFICINAS } from "@/lib/constants";
 import Image from "next/image";
 import { Send, Loader2, CheckCircle2, Search, Check, ChevronsUpDown, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -36,10 +36,12 @@ export default function HomePage() {
     lastName: "",
     position: "",
     customPosition: "",
+    oficina: "",
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [openCombo, setOpenCombo] = useState(false);
+  const [openOficinaCombo, setOpenOficinaCombo] = useState(false);
   const [dniExists, setDniExists] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,6 +72,7 @@ export default function HomePage() {
             lastName: existing.employee.lastName || prev.lastName,
             email: existing.employee.email || prev.email,
             position: existing.employee.position || prev.position,
+            oficina: existing.employee.oficina || prev.oficina,
           }));
           toast.info("Este DNI ya tiene un fotocheck registrado. Al enviar se actualizarán sus datos.");
           return;
@@ -124,6 +127,10 @@ export default function HomePage() {
       toast.error("Seleccione un cargo");
       return;
     }
+    if (!form.oficina) {
+      toast.error("Seleccione una oficina/dependencia");
+      return;
+    }
     if (!photoFile) {
       toast.error("Debe subir una foto");
       return;
@@ -156,6 +163,7 @@ export default function HomePage() {
           firstName: form.firstName,
           lastName: form.lastName,
           position: finalPosition,
+          oficina: form.oficina,
         }),
       });
       if (!empRes.ok) {
@@ -174,6 +182,7 @@ export default function HomePage() {
           firstName: form.firstName,
           lastName: form.lastName,
           position: finalPosition,
+          oficina: form.oficina,
           photoUrl,
           photoOriginal,
         }),
@@ -252,7 +261,7 @@ export default function HomePage() {
                 onClick={() => {
                   setSubmitted(false);
                   setDniExists(false);
-                  setForm({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "" });
+                  setForm({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "", oficina: "" });
                   setPhotoFile(null);
                   setPhotoPreview(null);
                 }}
@@ -475,6 +484,53 @@ export default function HomePage() {
                     )}
                   </div>
 
+                  {/* Oficina */}
+                  <div className="space-y-2">
+                    <Label>
+                      OFICINA / DEPENDENCIA <span className="text-destructive">*</span>
+                    </Label>
+                    <Popover open={openOficinaCombo} onOpenChange={setOpenOficinaCombo}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={openOficinaCombo}
+                          className="w-full justify-between font-normal"
+                        >
+                          {form.oficina || "Seleccionar oficina..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                        <Command>
+                          <CommandInput placeholder="Buscar oficina..." />
+                          <CommandList>
+                            <CommandEmpty>No se encontró la oficina.</CommandEmpty>
+                            <CommandGroup>
+                              {OFICINAS.map((ofi) => (
+                                <CommandItem
+                                  key={ofi}
+                                  value={ofi}
+                                  onSelect={() => {
+                                    setForm((prev) => ({ ...prev, oficina: ofi }));
+                                    setOpenOficinaCombo(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={`mr-2 h-4 w-4 ${
+                                      form.oficina === ofi ? "opacity-100" : "opacity-0"
+                                    }`}
+                                  />
+                                  {ofi}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
                   {/* Photo */}
                   <div className="space-y-2">
                     <Label>
@@ -575,6 +631,7 @@ export default function HomePage() {
                 lastName={form.lastName}
                 dni={form.dni}
                 position={finalPosition}
+                oficina={form.oficina}
                 email={form.email}
                 photoUrl={photoPreview}
               />

@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
     const fieldValues: Record<string, string> = {
       fullName: `${employee.firstName} ${employee.lastName}`,
       position: employee.position,
+      oficina: employee.oficina || "",
       dni: `DNI: ${employee.dni}`,
       email: employee.email,
     };

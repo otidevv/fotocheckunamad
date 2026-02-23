@@ -9,6 +9,7 @@ interface CarnetPreviewProps {
   lastName: string;
   dni: string;
   position: string;
+  oficina: string;
   email: string;
   photoUrl: string | null;
 }
@@ -58,6 +59,7 @@ export default function CarnetPreview(props: CarnetPreviewProps) {
   const fieldValues: Record<string, string> = {
     fullName: `${props.firstName || "NOMBRES"} ${props.lastName || "APELLIDOS"}`,
     position: props.position || "CARGO",
+    oficina: props.oficina || "OFICINA",
     dni: `DNI: ${props.dni || "00000000"}`,
     email: props.email || "correo@unamad.edu.pe",
   };
@@ -145,7 +147,7 @@ export default function CarnetPreview(props: CarnetPreviewProps) {
                   const charsPerLine = Math.floor(maxW / avgCharW);
                   const estimatedLines = Math.max(1, Math.ceil(text.length / charsPerLine));
                   fieldRefs.push({ key, lines: estimatedLines, lineHeight, fontSize });
-                  nextY = currentY + estimatedLines * lineHeight + fontSize * 0.6;
+                  nextY = currentY + estimatedLines * lineHeight + fontSize * 0.2;
                   return (
                     <div
                       key={key}

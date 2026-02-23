@@ -28,6 +28,7 @@ interface Employee {
   firstName: string;
   lastName: string;
   position: string;
+  oficina: string;
   photoUrl: string | null;
   photoOriginal: string | null;
   carnetFrontUrl: string | null;
@@ -201,6 +202,7 @@ export default function CarnetsPage() {
                   <TableHead>Nombres y Apellidos</TableHead>
                   <TableHead>DNI</TableHead>
                   <TableHead>Cargo</TableHead>
+                  <TableHead>Oficina</TableHead>
                   <TableHead>Carnet</TableHead>
                   <TableHead className="w-36">Acciones</TableHead>
                 </TableRow>
@@ -221,6 +223,7 @@ export default function CarnetsPage() {
                     <TableCell className="font-medium">{emp.firstName} {emp.lastName}</TableCell>
                     <TableCell className="text-muted-foreground">{emp.dni}</TableCell>
                     <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{emp.position}</TableCell>
+                    <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{emp.oficina}</TableCell>
                     <TableCell>
                       {emp.cardGenerated ? (
                         <Badge variant="default" className="cursor-pointer" onClick={() => setPreviewDialog({ open: true, employee: emp })}>
@@ -292,7 +295,7 @@ export default function CarnetsPage() {
               {previewDialog.employee?.firstName} {previewDialog.employee?.lastName}
             </DialogTitle>
             <DialogDescription>
-              DNI: {previewDialog.employee?.dni} | {previewDialog.employee?.position}
+              DNI: {previewDialog.employee?.dni} | {previewDialog.employee?.position} | {previewDialog.employee?.oficina}
             </DialogDescription>
           </DialogHeader>
           {previewDialog.employee && (
@@ -327,6 +330,7 @@ export default function CarnetsPage() {
               {/* Info */}
               <div className="grid grid-cols-2 gap-3 text-sm border-t pt-3">
                 <div><span className="text-muted-foreground">Correo:</span> {previewDialog.employee.email}</div>
+                <div><span className="text-muted-foreground">Oficina:</span> {previewDialog.employee.oficina}</div>
                 <div><span className="text-muted-foreground">Periodo:</span> {previewDialog.employee.year}</div>
                 <div><span className="text-muted-foreground">Registro:</span> {new Date(previewDialog.employee.createdAt).toLocaleDateString("es-PE")}</div>
                 <div><span className="text-muted-foreground">Estado:</span> {previewDialog.employee.status === "active" ? "Activo" : "Inactivo"}</div>

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import PhotoUpload from "@/components/PhotoUpload";
 import CarnetPreview from "@/components/CarnetPreview";
-import { POSITIONS } from "@/lib/constants";
+import { POSITIONS, OFICINAS } from "@/lib/constants";
 import { Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ export default function NewCarnetPage() {
     lastName: "",
     position: "",
     customPosition: "",
+    oficina: "",
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -52,6 +53,10 @@ export default function NewCarnetPage() {
       toast.error("Seleccione un cargo");
       return;
     }
+    if (!form.oficina) {
+      toast.error("Seleccione una oficina/dependencia");
+      return;
+    }
     if (!photoFile) {
       toast.error("Debe subir una foto");
       return;
@@ -79,6 +84,7 @@ export default function NewCarnetPage() {
           firstName: form.firstName,
           lastName: form.lastName,
           position: finalPosition,
+          oficina: form.oficina,
         }),
       });
       if (!empRes.ok) {
@@ -163,6 +169,20 @@ export default function NewCarnetPage() {
                 </div>
 
                 <div className="space-y-2">
+                  <Label>OFICINA / DEPENDENCIA *</Label>
+                  <Select value={form.oficina} onValueChange={(val) => setForm((prev) => ({ ...prev, oficina: val }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar oficina..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {OFICINAS.map((ofi) => (
+                        <SelectItem key={ofi} value={ofi}>{ofi}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
                   <Label>FOTO *</Label>
                   <PhotoUpload onPhotoReady={(file, url) => { setPhotoFile(file); setPhotoPreview(url); }} />
                 </div>
@@ -184,6 +204,7 @@ export default function NewCarnetPage() {
               lastName={form.lastName}
               dni={form.dni}
               position={finalPosition}
+              oficina={form.oficina}
               email={form.email}
               photoUrl={photoPreview}
             />

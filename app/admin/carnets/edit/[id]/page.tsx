@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import PhotoUpload from "@/components/PhotoUpload";
 import CarnetPreview from "@/components/CarnetPreview";
-import { POSITIONS } from "@/lib/constants";
+import { POSITIONS, OFICINAS } from "@/lib/constants";
 import { Save, Loader2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "" });
+  const [form, setForm] = useState({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "", oficina: "" });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
@@ -33,6 +33,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
           email: emp.email, dni: emp.dni, firstName: emp.firstName, lastName: emp.lastName,
           position: isCustom ? "__otro__" : emp.position,
           customPosition: isCustom ? emp.position : "",
+          oficina: emp.oficina || "",
         });
         setExistingPhotoUrl(emp.photoUrl);
         setPhotoPreview(emp.photoUrl);
@@ -64,7 +65,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
       const res = await fetch(`/api/employees/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: form.email, dni: form.dni, firstName: form.firstName, lastName: form.lastName, position: finalPosition }),
+        body: JSON.stringify({ email: form.email, dni: form.dni, firstName: form.firstName, lastName: form.lastName, position: finalPosition, oficina: form.oficina }),
       });
       if (!res.ok) { const err = await res.json(); throw new Error(err.error); }
 
@@ -132,6 +133,15 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
                   )}
                 </div>
                 <div className="space-y-2">
+                  <Label>OFICINA / DEPENDENCIA *</Label>
+                  <Select value={form.oficina} onValueChange={(v) => setForm((p) => ({ ...p, oficina: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Seleccionar oficina..." /></SelectTrigger>
+                    <SelectContent>
+                      {OFICINAS.map((ofi) => <SelectItem key={ofi} value={ofi}>{ofi}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label>FOTO (opcional, para cambiar la actual)</Label>
                   <PhotoUpload onPhotoReady={(f, u) => { setPhotoFile(f); setPhotoPreview(u); }} currentPhoto={existingPhotoUrl} />
                 </div>
@@ -145,7 +155,7 @@ export default function EditCarnetPage({ params }: { params: Promise<{ id: strin
         </div>
         <div className="lg:w-[300px]">
           <div className="sticky top-6">
-            <CarnetPreview firstName={form.firstName} lastName={form.lastName} dni={form.dni} position={finalPosition} email={form.email} photoUrl={photoPreview} />
+            <CarnetPreview firstName={form.firstName} lastName={form.lastName} dni={form.dni} position={finalPosition} oficina={form.oficina} email={form.email} photoUrl={photoPreview} />
           </div>
         </div>
       </div>
