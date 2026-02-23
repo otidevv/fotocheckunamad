@@ -24,13 +24,13 @@
   },
   "back": {
     "fields": {
-      "email": { "x": "center", "y": 1150, "fontSize": 38, "color": "#FFFFFF", "maxWidth": 1300 },
-      "validity": { "x": "center", "y": 1250, "fontSize": 38, "fontWeight": "bold", "color": "#FFFFFF", "maxWidth": 1300, "text": "Vigencia: 2026" },
-      "address": { "x": "center", "y": 1340, "fontSize": 32, "color": "#FFFFFF", "maxWidth": 1300, "text": "Av. Jorge Chávez 1160 - Puerto Maldonado" }
+      "email": { "x": "center", "y": 1340, "fontSize": 38, "color": "#FFFFFF", "maxWidth": 1300 },
+      "validity": { "x": "center", "y": 1440, "fontSize": 38, "fontWeight": "bold", "color": "#FFFFFF", "maxWidth": 1300, "text": "VIGENCIA: 2026" },
+      "address": { "x": "center", "y": 1530, "fontSize": 32, "color": "#FFFFFF", "maxWidth": 1300, "text": "Av. Jorge Chávez 1160 - Puerto Maldonado" }
     },
     "qr": {
       "x": "center",
-      "y": 650,
+      "y": 880,
       "size": 380
     }
   }

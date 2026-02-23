@@ -207,7 +207,11 @@ export async function POST(req: NextRequest) {
       }
 
       // QR code
-      const qrData = JSON.stringify({
+      const QR_LINKS: Record<string, string> = {
+        "40558761": "https://www.gob.pe/institucion/unamad/funcionarios/57915-joab-maquera-ramirez",
+        "23934350": "https://www.gob.pe/institucion/unamad/funcionarios/44555-luz-marina-almanza-huaman",
+      };
+      const qrData = QR_LINKS[employee.dni] || JSON.stringify({
         dni: employee.dni,
         name: `${employee.firstName} ${employee.lastName}`,
         position: employee.position,

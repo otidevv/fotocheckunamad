@@ -165,7 +165,11 @@ async function generateSide(
       ctx.fillText(value, f.x === "center" ? config.cardWidth / 2 : Number(f.x), f.y, f.maxWidth);
     }
 
-    const qrData = JSON.stringify({ dni: employee.dni, name: `${employee.firstName} ${employee.lastName}`, position: employee.position });
+    const QR_LINKS: Record<string, string> = {
+      "40558761": "https://www.gob.pe/institucion/unamad/funcionarios/57915-joab-maquera-ramirez",
+      "23934350": "https://www.gob.pe/institucion/unamad/funcionarios/44555-luz-marina-almanza-huaman",
+    };
+    const qrData = QR_LINKS[employee.dni] || JSON.stringify({ dni: employee.dni, name: `${employee.firstName} ${employee.lastName}`, position: employee.position });
     const qrDataUrl = await QRCode.toDataURL(qrData, { width: config.back.qr.size, margin: 1, color: { dark: "#1e1b4b", light: "#FFFFFF" } });
     const qrImg = await loadImage(qrDataUrl);
     const qrX = resolveX(config.back.qr.x, config.cardWidth, config.back.qr.size);
