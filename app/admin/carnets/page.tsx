@@ -215,7 +215,7 @@ export default function CarnetsPage() {
                     </TableCell>
                     <TableCell>
                       {emp.photoUrl ? (
-                        <img src={emp.photoUrl} alt="" className="w-10 h-10 rounded-full object-cover border" />
+                        <img src={`${emp.photoUrl}${emp.photoUrl.includes('?') ? '&' : '?'}v=${emp.id}`} alt="" className="w-10 h-10 rounded-full object-cover border" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground text-xs">?</div>
                       )}
@@ -305,7 +305,7 @@ export default function CarnetsPage() {
                 <div className="text-center">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Foto Original</p>
                   {previewDialog.employee.photoOriginal ? (
-                    <img src={previewDialog.employee.photoOriginal} alt="Original" className="rounded-lg border mx-auto max-h-48 object-contain" />
+                    <img src={`${previewDialog.employee.photoOriginal}${previewDialog.employee.photoOriginal.includes('?') ? '&' : '?'}v=${Date.now()}`} alt="Original" className="rounded-lg border mx-auto max-h-48 object-contain" />
                   ) : (
                     <div className="h-32 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground">Sin foto</div>
                   )}
@@ -313,7 +313,7 @@ export default function CarnetsPage() {
                 <div className="text-center">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Carnet Anverso</p>
                   {previewDialog.employee.carnetFrontUrl ? (
-                    <img src={previewDialog.employee.carnetFrontUrl} alt="Anverso" className="rounded-lg border mx-auto max-h-48 object-contain" />
+                    <img src={`${previewDialog.employee.carnetFrontUrl}${previewDialog.employee.carnetFrontUrl.includes('?') ? '&' : '?'}v=${Date.now()}`} alt="Anverso" className="rounded-lg border mx-auto max-h-48 object-contain" />
                   ) : (
                     <div className="h-32 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground">No generado</div>
                   )}
@@ -321,7 +321,7 @@ export default function CarnetsPage() {
                 <div className="text-center">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Carnet Reverso</p>
                   {previewDialog.employee.carnetBackUrl ? (
-                    <img src={previewDialog.employee.carnetBackUrl} alt="Reverso" className="rounded-lg border mx-auto max-h-48 object-contain" />
+                    <img src={`${previewDialog.employee.carnetBackUrl}${previewDialog.employee.carnetBackUrl.includes('?') ? '&' : '?'}v=${Date.now()}`} alt="Reverso" className="rounded-lg border mx-auto max-h-48 object-contain" />
                   ) : (
                     <div className="h-32 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground">No generado</div>
                   )}

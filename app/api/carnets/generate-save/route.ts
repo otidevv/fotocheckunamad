@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Circular photo
-    const photoSrc = employee.photoOriginal || employee.photoUrl;
+    const photoSrc = (employee.photoOriginal || employee.photoUrl)?.split("?")[0];
     if (photoSrc) {
       try {
         const photoImg = await loadImage(path.join(process.cwd(), "public", photoSrc));
@@ -190,8 +190,9 @@ export async function POST(req: NextRequest) {
     await fs.writeFile(path.join(carnetsDir, backFileName), backBuffer);
 
     // Update employee with carnet URLs
-    const carnetFrontUrl = `/uploads/carnets/${frontFileName}`;
-    const carnetBackUrl = `/uploads/carnets/${backFileName}`;
+    const timestamp = Date.now();
+    const carnetFrontUrl = `/uploads/carnets/${frontFileName}?t=${timestamp}`;
+    const carnetBackUrl = `/uploads/carnets/${backFileName}?t=${timestamp}`;
 
     await prisma.employee.update({
       where: { id: employeeId },

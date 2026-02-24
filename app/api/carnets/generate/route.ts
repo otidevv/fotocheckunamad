@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Draw photo CLIPPED in a CIRCLE
-      const photoSrc = employee.photoOriginal || employee.photoUrl;
+      const photoSrc = (employee.photoOriginal || employee.photoUrl)?.split("?")[0];
       if (photoSrc) {
         const photoPath = path.join(process.cwd(), "public", photoSrc);
         try {
