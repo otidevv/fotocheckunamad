@@ -37,7 +37,6 @@ export default function HomePage() {
     position: "",
     customPosition: "",
     oficina: "",
-    customOficina: "",
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -128,8 +127,10 @@ export default function HomePage() {
       toast.error("Seleccione un cargo");
       return;
     }
-    const finalOficina =
-      form.oficina === "__otro__" ? form.customOficina : form.oficina;
+    if (!form.oficina) {
+      toast.error("Seleccione una oficina/dependencia");
+      return;
+    }
     if (!photoFile) {
       toast.error("Debe subir una foto");
       return;
@@ -162,7 +163,7 @@ export default function HomePage() {
           firstName: form.firstName,
           lastName: form.lastName,
           position: finalPosition,
-          oficina: finalOficina,
+          oficina: form.oficina,
         }),
       });
       if (!empRes.ok) {
@@ -181,7 +182,7 @@ export default function HomePage() {
           firstName: form.firstName,
           lastName: form.lastName,
           position: finalPosition,
-          oficina: finalOficina,
+          oficina: form.oficina,
           photoUrl,
           photoOriginal,
         }),
@@ -218,8 +219,6 @@ export default function HomePage() {
 
   const finalPosition =
     form.position === "__otro__" ? form.customPosition : form.position;
-  const finalOficina =
-    form.oficina === "__otro__" ? form.customOficina : form.oficina;
 
   // Success screen
   if (submitted) {
@@ -262,7 +261,7 @@ export default function HomePage() {
                 onClick={() => {
                   setSubmitted(false);
                   setDniExists(false);
-                  setForm({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "", oficina: "", customOficina: "" });
+                  setForm({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "", oficina: "" });
                   setPhotoFile(null);
                   setPhotoPreview(null);
                 }}
@@ -488,7 +487,7 @@ export default function HomePage() {
                   {/* Oficina */}
                   <div className="space-y-2">
                     <Label>
-                      OFICINA / DEPENDENCIA
+                      OFICINA / DEPENDENCIA <span className="text-destructive">*</span>
                     </Label>
                     <Popover open={openOficinaCombo} onOpenChange={setOpenOficinaCombo}>
                       <PopoverTrigger asChild>
@@ -498,11 +497,7 @@ export default function HomePage() {
                           aria-expanded={openOficinaCombo}
                           className="w-full justify-between font-normal"
                         >
-                          {form.oficina
-                            ? form.oficina === "__otro__"
-                              ? "Otro (especificar)"
-                              : form.oficina
-                            : "Seleccionar oficina..."}
+                          {form.oficina || "Seleccionar oficina..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </PopoverTrigger>
@@ -529,34 +524,11 @@ export default function HomePage() {
                                   {ofi}
                                 </CommandItem>
                               ))}
-                              <CommandItem
-                                value="Otro (especificar)"
-                                onSelect={() => {
-                                  setForm((prev) => ({ ...prev, oficina: "__otro__" }));
-                                  setOpenOficinaCombo(false);
-                                }}
-                              >
-                                <Check
-                                  className={`mr-2 h-4 w-4 ${
-                                    form.oficina === "__otro__" ? "opacity-100" : "opacity-0"
-                                  }`}
-                                />
-                                Otro (especificar)
-                              </CommandItem>
                             </CommandGroup>
                           </CommandList>
                         </Command>
                       </PopoverContent>
                     </Popover>
-                    {form.oficina === "__otro__" && (
-                      <Input
-                        name="customOficina"
-                        value={form.customOficina}
-                        onChange={handleChange}
-                        placeholder="Escriba la oficina..."
-                        className="mt-2 uppercase"
-                      />
-                    )}
                   </div>
 
                   {/* Photo */}
@@ -659,7 +631,7 @@ export default function HomePage() {
                 lastName={form.lastName}
                 dni={form.dni}
                 position={finalPosition}
-                oficina={finalOficina}
+                oficina={form.oficina}
                 email={form.email}
                 photoUrl={photoPreview}
               />
