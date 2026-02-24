@@ -305,7 +305,13 @@ export default function CarnetsPage() {
                 <div className="text-center">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Foto Original</p>
                   {previewDialog.employee.photoOriginal ? (
-                    <img src={`${previewDialog.employee.photoOriginal}${previewDialog.employee.photoOriginal.includes('?') ? '&' : '?'}v=${Date.now()}`} alt="Original" className="rounded-lg border mx-auto max-h-48 object-contain" />
+                    <a
+                      href={previewDialog.employee.photoOriginal.split("?")[0]}
+                      download={`foto-${previewDialog.employee.dni}.jpg`}
+                      title="Click para descargar"
+                    >
+                      <img src={`${previewDialog.employee.photoOriginal}${previewDialog.employee.photoOriginal.includes('?') ? '&' : '?'}v=${Date.now()}`} alt="Original" className="rounded-lg border mx-auto max-h-48 object-contain cursor-pointer hover:opacity-80 transition-opacity" />
+                    </a>
                   ) : (
                     <div className="h-32 bg-muted rounded-lg flex items-center justify-center text-xs text-muted-foreground">Sin foto</div>
                   )}
