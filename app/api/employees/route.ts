@@ -88,9 +88,13 @@ export async function POST(req: NextRequest) {
     const employee = await prisma.employee.create({ data });
     return NextResponse.json(employee, { status: 201 });
   } catch (error) {
+    console.error("Error en POST /api/employees:", error);
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Datos inválidos", details: error }, { status: 400 });
     }
-    return NextResponse.json({ error: "Error al crear empleado" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Error al crear empleado" },
+      { status: 500 }
+    );
   }
 }

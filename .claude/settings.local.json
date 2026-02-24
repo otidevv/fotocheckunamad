@@ -10,7 +10,8 @@
       "Bash(curl:*)",
       "Bash(pm2 logs:*)",
       "Bash(node -e \":*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(cd /c/Apache24/htdocs/carnetunamad && git rm -r --cached public/uploads 2>&1)"
     ]
   }
 }
