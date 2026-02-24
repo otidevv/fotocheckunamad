@@ -38,8 +38,9 @@ export async function POST(req: NextRequest) {
     const processedPath = path.join(photosDir, `${dni}.jpg`);
     await fs.writeFile(processedPath, processedBuffer);
 
-    const photoUrl = `/uploads/photos/${dni}.jpg`;
-    const photoOriginal = `/uploads/originals/${dni}.jpg`;
+    const timestamp = Date.now();
+    const photoUrl = `/uploads/photos/${dni}.jpg?t=${timestamp}`;
+    const photoOriginal = `/uploads/originals/${dni}.jpg?t=${timestamp}`;
 
     return NextResponse.json({ photoUrl, photoOriginal });
   } catch (error) {
