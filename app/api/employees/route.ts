@@ -6,6 +6,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const search = searchParams.get("search") || "";
   const status = searchParams.get("status") || "";
+  const oficina = searchParams.get("oficina") || "";
   const cardGenerated = searchParams.get("cardGenerated") || "";
   const dateFrom = searchParams.get("dateFrom") || "";
   const dateTo = searchParams.get("dateTo") || "";
@@ -27,6 +28,10 @@ export async function GET(req: NextRequest) {
     where.status = status;
   }
 
+  if (oficina) {
+    where.oficina = oficina;
+  }
+
   if (cardGenerated === "true") {
     where.cardGenerated = true;
   } else if (cardGenerated === "false") {
@@ -46,7 +51,7 @@ export async function GET(req: NextRequest) {
     where.createdAt = createdAtFilter;
   }
 
-  const [employees, total] = await Promise.all([
+  const [employees, total, oficinas] = await Promise.all([
     prisma.employee.findMany({
       where,
       orderBy: { createdAt: orderBy === "oldest" ? "asc" : "desc" },
@@ -54,6 +59,12 @@ export async function GET(req: NextRequest) {
       take: limit,
     }),
     prisma.employee.count({ where }),
+    prisma.employee.findMany({
+      where: { oficina: { not: "" } },
+      select: { oficina: true },
+      distinct: ["oficina"],
+      orderBy: { oficina: "asc" },
+    }),
   ]);
 
   return NextResponse.json({
@@ -61,6 +72,7 @@ export async function GET(req: NextRequest) {
     total,
     pages: Math.ceil(total / limit),
     page,
+    oficinas: oficinas.map((o) => o.oficina),
   });
 }
 
@@ -88,9 +100,13 @@ export async function POST(req: NextRequest) {
     const employee = await prisma.employee.create({ data });
     return NextResponse.json(employee, { status: 201 });
   } catch (error) {
+    console.error("Error en POST /api/employees:", error);
     if (error instanceof Error && error.name === "ZodError") {
       return NextResponse.json({ error: "Datos inválidos", details: error }, { status: 400 });
     }
-    return NextResponse.json({ error: "Error al crear empleado" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Error al crear empleado" },
+      { status: 500 }
+    );
   }
 }

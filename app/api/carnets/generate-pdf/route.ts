@@ -93,7 +93,7 @@ async function generateSide(
     }
 
     // Circular photo
-    const photoSrc = employee.photoOriginal || employee.photoUrl;
+    const photoSrc = (employee.photoOriginal || employee.photoUrl)?.split("?")[0];
     if (photoSrc) {
       try {
         const photoImg = await loadImage(path.join(process.cwd(), "public", photoSrc));

@@ -1,9 +1,18 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useRef } from "react";
 import { useDropzone } from "react-dropzone";
-import { Upload, CheckCircle2, XCircle, Loader2, ImagePlus } from "lucide-react";
+import { Upload, CheckCircle2, XCircle, Loader2, ImagePlus, AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 interface ValidationResult {
   label: string;
@@ -19,6 +28,10 @@ export default function PhotoUpload({ onPhotoReady, currentPhoto }: PhotoUploadP
   const [preview, setPreview] = useState<string | null>(currentPhoto || null);
   const [validating, setValidating] = useState(false);
   const [validations, setValidations] = useState<ValidationResult[]>([]);
+  const [showConvertModal, setShowConvertModal] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [pendingUrl, setPendingUrl] = useState<string | null>(null);
+  const [pendingDimensions, setPendingDimensions] = useState<{ width: number; height: number } | null>(null);
 
   const validatePhoto = useCallback(
     async (file: File) => {
@@ -62,15 +75,55 @@ export default function PhotoUpload({ onPhotoReady, currentPhoto }: PhotoUploadP
       setValidating(false);
 
       if (results.every((r) => r.passed)) {
+        // All validations passed - accept photo directly
         setPreview(url);
         onPhotoReady(file, url);
+      } else if (results[0].passed && results[1].passed) {
+        // Format and size are OK, but dimensions/ratio failed
+        // Show modal to offer conversion
+        setPendingFile(file);
+        setPendingUrl(url);
+        setPendingDimensions({ width: img.width, height: img.height });
+        setShowConvertModal(true);
       } else {
+        // Format or size failed - cannot convert
         URL.revokeObjectURL(url);
         setPreview(null);
       }
     },
     [onPhotoReady]
   );
+
+  const handleAcceptConvert = useCallback(() => {
+    if (pendingFile && pendingUrl) {
+      setPreview(pendingUrl);
+      onPhotoReady(pendingFile, pendingUrl);
+      // Update validations to show converted status
+      setValidations((prev) =>
+        prev.map((v) => {
+          if (!v.passed) {
+            return { ...v, label: v.label + " (se convertirá)", passed: true };
+          }
+          return v;
+        })
+      );
+    }
+    setShowConvertModal(false);
+    setPendingFile(null);
+    setPendingUrl(null);
+    setPendingDimensions(null);
+  }, [pendingFile, pendingUrl, onPhotoReady]);
+
+  const handleCancelConvert = useCallback(() => {
+    if (pendingUrl) {
+      URL.revokeObjectURL(pendingUrl);
+    }
+    setShowConvertModal(false);
+    setPendingFile(null);
+    setPendingUrl(null);
+    setPendingDimensions(null);
+    setPreview(null);
+  }, [pendingUrl]);
 
   const onDrop = useCallback(
     (files: File[]) => {
@@ -147,6 +200,52 @@ export default function PhotoUpload({ onPhotoReady, currentPhoto }: PhotoUploadP
           </CardContent>
         </Card>
       )}
+
+      {/* Modal de conversión de foto */}
+      <Dialog open={showConvertModal} onOpenChange={(open) => {
+        if (!open) handleCancelConvert();
+      }}>
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <DialogTitle>Foto no cumple el formato de carnet</DialogTitle>
+              </div>
+            </div>
+            <DialogDescription asChild>
+              <div className="mt-3 space-y-3">
+                <p>
+                  La foto que subiste tiene un tamaño de{" "}
+                  <strong>{pendingDimensions?.width}×{pendingDimensions?.height}px</strong>,
+                  que no corresponde a la proporción requerida para un carnet (<strong>5:6</strong>, por ejemplo 240×288px).
+                </p>
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-amber-800 text-sm">
+                  <p className="font-semibold mb-1">Advertencia:</p>
+                  <p>
+                    Si decide continuar, la foto será redimensionada automáticamente al formato
+                    de carnet. Esto puede causar <strong>distorsión o recorte</strong> en la imagen,
+                    ya que no tiene las proporciones ideales.
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Para mejores resultados, se recomienda usar una foto con proporción 5:6 (vertical, tipo carnet).
+                </p>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-2 gap-2 sm:gap-0">
+            <Button variant="outline" onClick={handleCancelConvert}>
+              Cancelar
+            </Button>
+            <Button variant="default" onClick={handleAcceptConvert} className="bg-amber-600 hover:bg-amber-700">
+              Convertir de todas formas
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
