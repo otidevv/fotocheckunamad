@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Users, PlusCircle, Printer, Settings, CreditCard, Home, LogOut } from "lucide-react";
+import { Users, PlusCircle, Printer, Settings, CreditCard, Home, LogOut, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -10,6 +10,7 @@ const navItems = [
   { href: "/admin/carnets", label: "Listado Personal", icon: Users, exact: true },
   { href: "/admin/carnets/new", label: "Nuevo Fotocheck", icon: PlusCircle },
   { href: "/admin/carnets/print", label: "Imprimir Lote", icon: Printer },
+  { href: "/admin/carnets/reports", label: "Reportes", icon: BarChart3 },
   { href: "/admin/config", label: "Configuración", icon: Settings },
 ];
 

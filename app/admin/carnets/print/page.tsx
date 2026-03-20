@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import {
   ArrowLeft, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  Loader2, Printer, Search, Calendar,
+  Loader2, Printer, Search, Calendar, CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,8 @@ interface Employee {
   photoUrl: string | null;
   status: string;
   cardGenerated: boolean;
+  cardPrinted: boolean;
+  printedAt: string | null;
   createdAt: string;
 }
 
@@ -34,6 +36,7 @@ export default function PrintPage() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [generating, setGenerating] = useState(false);
+  const [markingPrinted, setMarkingPrinted] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [carnetFilter, setCarnetFilter] = useState("all");
@@ -108,6 +111,26 @@ export default function PrintPage() {
     }
   };
 
+  const handleMarkPrinted = async () => {
+    if (selected.size === 0) { toast.error("Seleccione al menos un empleado"); return; }
+    setMarkingPrinted(true);
+    try {
+      const res = await fetch("/api/carnets/mark-printed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeIds: Array.from(selected) }),
+      });
+      if (!res.ok) throw new Error();
+      toast.success(`${selected.size} carnet(s) marcado(s) como impresos`);
+      setSelected(new Set());
+      fetchEmployees();
+    } catch {
+      toast.error("Error al marcar como impresos");
+    } finally {
+      setMarkingPrinted(false);
+    }
+  };
+
   const rangeStart = total === 0 ? 0 : (page - 1) * limit + 1;
   const rangeEnd = Math.min(page * limit, total);
 
@@ -137,10 +160,16 @@ export default function PrintPage() {
             {total} empleado{total !== 1 ? "s" : ""} encontrado{total !== 1 ? "s" : ""} - Selecciona el personal para generar PDF
           </p>
         </div>
-        <Button onClick={handlePrint} disabled={generating || selected.size === 0} className="gap-2">
-          {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
-          Generar PDF ({selected.size})
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleMarkPrinted} disabled={markingPrinted || selected.size === 0} variant="outline" className="gap-2">
+            {markingPrinted ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+            Marcar impresos ({selected.size})
+          </Button>
+          <Button onClick={handlePrint} disabled={generating || selected.size === 0} className="gap-2">
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
+            Generar PDF ({selected.size})
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -271,6 +300,7 @@ export default function PrintPage() {
                   <TableHead>Cargo</TableHead>
                   <TableHead>Oficina</TableHead>
                   <TableHead>Carnet</TableHead>
+                  <TableHead>Impresión</TableHead>
                   <TableHead>Fecha Registro</TableHead>
                 </TableRow>
               </TableHeader>
@@ -299,6 +329,17 @@ export default function PrintPage() {
                       ) : (
                         <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800">
                           Pendiente
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {emp.cardPrinted ? (
+                        <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
+                          Impreso
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-muted-foreground">
+                          No impreso
                         </Badge>
                       )}
                     </TableCell>
