@@ -38,6 +38,13 @@ export async function GET(req: NextRequest) {
     where.cardGenerated = false;
   }
 
+  const cardPrinted = searchParams.get("cardPrinted") || "";
+  if (cardPrinted === "true") {
+    where.cardPrinted = true;
+  } else if (cardPrinted === "false") {
+    where.cardPrinted = false;
+  }
+
   if (dateFrom || dateTo) {
     const createdAtFilter: Record<string, Date> = {};
     if (dateFrom) {

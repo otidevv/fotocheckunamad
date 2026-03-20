@@ -3,12 +3,15 @@
 import { useEffect, useState, use } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { ArrowLeft, Download, FileText, Loader2, RefreshCw } from "lucide-react";
+import { ArrowLeft, Download, FileText, Loader2, RefreshCw, CheckCircle2, MessageSquare, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Employee {
   id: string;
@@ -19,6 +22,9 @@ interface Employee {
   position: string;
   photoUrl: string | null;
   cardGenerated: boolean;
+  cardPrinted: boolean;
+  printedAt: string | null;
+  observations: string;
 }
 
 export default function GenerateCarnetPage({ params }: { params: Promise<{ id: string }> }) {
@@ -28,11 +34,14 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
   const [frontUrl, setFrontUrl] = useState<string | null>(null);
   const [backUrl, setBackUrl] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [markingPrinted, setMarkingPrinted] = useState(false);
+  const [obsText, setObsText] = useState("");
+  const [savingObs, setSavingObs] = useState(false);
 
   useEffect(() => {
     fetch(`/api/employees/${id}`)
       .then((r) => r.ok ? r.json() : Promise.reject())
-      .then(setEmployee)
+      .then((emp) => { setEmployee(emp); setObsText(emp.observations || ""); })
       .catch(() => toast.error("Empleado no encontrado"))
       .finally(() => setLoading(false));
   }, [id]);
@@ -95,6 +104,44 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
       URL.revokeObjectURL(url);
     } catch {
       toast.error("Error al generar PDF");
+    }
+  };
+
+  const togglePrinted = async (printed: boolean) => {
+    if (!employee) return;
+    setMarkingPrinted(true);
+    try {
+      const res = await fetch("/api/carnets/mark-printed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employeeIds: id, printed }),
+      });
+      if (!res.ok) throw new Error();
+      setEmployee({ ...employee, cardPrinted: printed, printedAt: printed ? new Date().toISOString() : null });
+      toast.success(printed ? "Marcado como impreso" : "Desmarcado como impreso");
+    } catch {
+      toast.error("Error al actualizar estado de impresión");
+    } finally {
+      setMarkingPrinted(false);
+    }
+  };
+
+  const saveObservations = async () => {
+    if (!employee) return;
+    setSavingObs(true);
+    try {
+      const res = await fetch(`/api/employees/${id}/observations`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ observations: obsText }),
+      });
+      if (!res.ok) throw new Error();
+      setEmployee({ ...employee, observations: obsText });
+      toast.success("Observaciones guardadas");
+    } catch {
+      toast.error("Error al guardar observaciones");
+    } finally {
+      setSavingObs(false);
     }
   };
 
@@ -196,6 +243,57 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
                   </Badge>
                 </div>
               </div>
+              <Separator />
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  id="printed"
+                  checked={employee.cardPrinted}
+                  onCheckedChange={(checked) => togglePrinted(!!checked)}
+                  disabled={markingPrinted}
+                />
+                <Label htmlFor="printed" className="flex items-center gap-2 cursor-pointer text-sm">
+                  <CheckCircle2 className={`w-4 h-4 ${employee.cardPrinted ? "text-emerald-600" : "text-muted-foreground"}`} />
+                  {employee.cardPrinted ? "Impreso" : "Marcar como impreso"}
+                </Label>
+              </div>
+              {employee.cardPrinted && employee.printedAt && (
+                <p className="text-xs text-muted-foreground">
+                  Impreso el {new Date(employee.printedAt).toLocaleDateString("es-PE")}
+                </p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                Observaciones
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Textarea
+                placeholder="Ej: Foto borrosa, datos incorrectos..."
+                value={obsText}
+                onChange={(e) => setObsText(e.target.value)}
+                rows={3}
+                className="text-sm resize-none"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full gap-2"
+                onClick={saveObservations}
+                disabled={savingObs || obsText === (employee.observations || "")}
+              >
+                {savingObs ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                Guardar observaciones
+              </Button>
+              {employee.observations && (
+                <div className="rounded-md bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 p-2">
+                  <p className="text-xs text-amber-700 dark:text-amber-300">{employee.observations}</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

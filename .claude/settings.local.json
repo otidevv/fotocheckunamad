@@ -11,7 +11,9 @@
       "Bash(pm2 logs:*)",
       "Bash(node -e \":*)",
       "Bash(node:*)",
-      "Bash(cd /c/Apache24/htdocs/carnetunamad && git rm -r --cached public/uploads 2>&1)"
+      "Bash(cd /c/Apache24/htdocs/carnetunamad && git rm -r --cached public/uploads 2>&1)",
+      "Bash(find C:Apache24htdocsfotocheckunamad/app -name *carnet* -type f)",
+      "Bash(npm ls:*)"
     ]
   }
 }

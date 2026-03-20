@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import {
   Search, PlusCircle, Eye, Pencil, Trash2, Download,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight,
-  Loader2, Users, Image as ImageIcon, Calendar,
+  Loader2, Users, Image as ImageIcon, Calendar, AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,6 +37,7 @@ interface Employee {
   year: number;
   status: string;
   cardGenerated: boolean;
+  observations: string;
   createdAt: string;
 }
 
@@ -343,18 +344,25 @@ export default function CarnetsPage() {
                     <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{emp.position}</TableCell>
                     <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{emp.oficina}</TableCell>
                     <TableCell>
-                      {emp.cardGenerated ? (
-                        <Badge
-                          className="cursor-pointer bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800"
-                          onClick={() => setPreviewDialog({ open: true, employee: emp })}
-                        >
-                          Generado
-                        </Badge>
-                      ) : (
-                        <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800">
-                          Pendiente
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-1.5">
+                        {emp.cardGenerated ? (
+                          <Badge
+                            className="cursor-pointer bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800"
+                            onClick={() => setPreviewDialog({ open: true, employee: emp })}
+                          >
+                            Generado
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800">
+                            Pendiente
+                          </Badge>
+                        )}
+                        {emp.observations && (
+                          <span title={emp.observations}>
+                            <AlertTriangle className="w-4 h-4 text-amber-500" />
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
@@ -501,6 +509,14 @@ export default function CarnetsPage() {
                 <div><span className="text-muted-foreground">Registro:</span> {new Date(previewDialog.employee.createdAt).toLocaleDateString("es-PE")}</div>
                 <div><span className="text-muted-foreground">Estado:</span> {previewDialog.employee.status === "active" ? "Activo" : "Inactivo"}</div>
               </div>
+              {previewDialog.employee.observations && (
+                <div className="rounded-md bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 p-3 mt-2">
+                  <p className="text-xs font-medium text-amber-700 dark:text-amber-300 flex items-center gap-1.5 mb-1">
+                    <AlertTriangle className="w-3.5 h-3.5" /> Observaciones
+                  </p>
+                  <p className="text-sm text-amber-800 dark:text-amber-200">{previewDialog.employee.observations}</p>
+                </div>
+              )}
             </div>
           )}
         </DialogContent>
