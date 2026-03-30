@@ -6,7 +6,7 @@ import PhotoUpload from "@/components/PhotoUpload";
 import CarnetPreview from "@/components/CarnetPreview";
 import { POSITIONS, OFICINAS } from "@/lib/constants";
 import Image from "next/image";
-import { Send, Loader2, CheckCircle2, Search, Check, ChevronsUpDown, AlertTriangle } from "lucide-react";
+import { Send, Loader2, CheckCircle2, Search, Check, ChevronsUpDown, AlertTriangle, Printer, PackageCheck, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const REGISTRO_CERRADO = true; // Cambiar a false para reactivar el formulario
+const REGISTRO_CERRADO = false; // Cambiar a true para cerrar el registro
 
 export default function HomePage() {
   const [saving, setSaving] = useState(false);
@@ -45,6 +45,48 @@ export default function HomePage() {
   const [openCombo, setOpenCombo] = useState(false);
   const [openOficinaCombo, setOpenOficinaCombo] = useState(false);
   const [dniExists, setDniExists] = useState(false);
+
+  // Consulta estado fotocheck
+  const [consultaDni, setConsultaDni] = useState("");
+  const [consultando, setConsultando] = useState(false);
+  const [consultaResult, setConsultaResult] = useState<{
+    found: boolean;
+    firstName?: string;
+    lastName?: string;
+    oficina?: string;
+    cardPrinted?: boolean;
+    cardDelivered?: boolean;
+  } | null>(null);
+
+  const consultarEstado = async (dniValue: string) => {
+    if (!/^\d{8}$/.test(dniValue)) {
+      toast.error("Ingrese un DNI válido de 8 dígitos");
+      return;
+    }
+    setConsultando(true);
+    setConsultaResult(null);
+    try {
+      const res = await fetch(`/api/employees/check-dni/${dniValue}`);
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (data.exists) {
+        setConsultaResult({
+          found: true,
+          firstName: data.employee.firstName,
+          lastName: data.employee.lastName,
+          oficina: data.employee.oficina,
+          cardPrinted: data.employee.cardPrinted,
+          cardDelivered: data.employee.cardDelivered,
+        });
+      } else {
+        setConsultaResult({ found: false });
+      }
+    } catch {
+      toast.error("Error al consultar");
+    } finally {
+      setConsultando(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -311,20 +353,118 @@ export default function HomePage() {
       </div>
 
       <main className="max-w-6xl mx-auto px-4 py-8 relative">
-        <div className="flex flex-col lg:flex-row gap-8">
+        {/* Consulta de estado de fotocheck */}
+        {REGISTRO_CERRADO && (
+          <div className="max-w-2xl mx-auto mb-8">
+            <Card>
+              <CardContent className="p-6 sm:p-8">
+                <div className="flex flex-col items-center gap-3 rounded-lg border border-red-300 bg-red-50 p-5 mb-6">
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                  <h2 className="text-lg font-bold text-red-800">Registro Cerrado</h2>
+                  <p className="text-sm text-red-700 text-center">
+                    El periodo de registro para el fotocheck ha finalizado. Gracias por su participacion.
+                  </p>
+                </div>
+
+                <h1 className="text-xl font-bold mb-1 text-center">
+                  Consultar Estado de Fotocheck
+                </h1>
+                <p className="text-sm text-muted-foreground mb-6 text-center">
+                  Ingrese su numero de DNI para verificar si su fotocheck ya fue impreso.
+                </p>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    consultarEstado(consultaDni);
+                  }}
+                  className="flex gap-3 max-w-md mx-auto"
+                >
+                  <div className="relative flex-1">
+                    <Input
+                      value={consultaDni}
+                      onChange={(e) => {
+                        const v = e.target.value.replace(/\D/g, "").slice(0, 8);
+                        setConsultaDni(v);
+                        setConsultaResult(null);
+                      }}
+                      placeholder="Ingrese su DNI de 8 digitos"
+                      maxLength={8}
+                      className="pr-10 text-lg h-12"
+                    />
+                    {consultando && (
+                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 animate-spin text-primary" />
+                    )}
+                  </div>
+                  <Button type="submit" disabled={consultando || consultaDni.length !== 8} size="lg" className="h-12">
+                    <Search className="w-4 h-4 mr-2" />
+                    Consultar
+                  </Button>
+                </form>
+
+                {/* Resultado de consulta */}
+                {consultaResult && !consultaResult.found && (
+                  <div className="mt-6 flex items-center gap-3 rounded-lg border border-amber-300 bg-amber-50 p-4 max-w-md mx-auto">
+                    <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0" />
+                    <div>
+                      <p className="font-semibold text-amber-800">DNI no registrado</p>
+                      <p className="text-sm text-amber-700">No se encontro un fotocheck asociado a este DNI.</p>
+                    </div>
+                  </div>
+                )}
+
+                {consultaResult && consultaResult.found && (
+                  <div className="mt-6 max-w-md mx-auto rounded-lg border p-5 space-y-4">
+                    <div className="text-center">
+                      <p className="font-bold text-lg">{consultaResult.lastName}, {consultaResult.firstName}</p>
+                      {consultaResult.oficina && (
+                        <p className="text-sm text-muted-foreground">{consultaResult.oficina}</p>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Estado Impresion */}
+                      <div className={`rounded-lg p-4 text-center ${consultaResult.cardPrinted ? "bg-green-50 border border-green-200" : "bg-amber-50 border border-amber-200"}`}>
+                        {consultaResult.cardPrinted ? (
+                          <Printer className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                        ) : (
+                          <Clock className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+                        )}
+                        <p className={`font-bold text-sm ${consultaResult.cardPrinted ? "text-green-800" : "text-amber-800"}`}>
+                          {consultaResult.cardPrinted ? "IMPRESO" : "PENDIENTE"}
+                        </p>
+                        <p className={`text-xs ${consultaResult.cardPrinted ? "text-green-600" : "text-amber-600"}`}>
+                          {consultaResult.cardPrinted ? "Su fotocheck ya fue impreso" : "Aun no se ha impreso"}
+                        </p>
+                      </div>
+
+                      {/* Estado Entrega */}
+                      <div className={`rounded-lg p-4 text-center ${consultaResult.cardDelivered ? "bg-green-50 border border-green-200" : "bg-gray-50 border border-gray-200"}`}>
+                        {consultaResult.cardDelivered ? (
+                          <PackageCheck className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                        ) : (
+                          <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                        )}
+                        <p className={`font-bold text-sm ${consultaResult.cardDelivered ? "text-green-800" : "text-gray-600"}`}>
+                          {consultaResult.cardDelivered ? "ENTREGADO" : "NO ENTREGADO"}
+                        </p>
+                        <p className={`text-xs ${consultaResult.cardDelivered ? "text-green-600" : "text-gray-500"}`}>
+                          {consultaResult.cardDelivered ? "Ya fue entregado" : "Pendiente de entrega"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {!REGISTRO_CERRADO && <div className="flex flex-col lg:flex-row gap-8">
           {/* LEFT: Form */}
           <div className="flex-1">
             <Card>
               <CardContent className="p-6 sm:p-8">
-                {REGISTRO_CERRADO && (
-                  <div className="flex flex-col items-center gap-3 rounded-lg border border-red-300 bg-red-50 p-6 mb-6">
-                    <AlertTriangle className="w-8 h-8 text-red-600" />
-                    <h2 className="text-lg font-bold text-red-800">Registro Cerrado</h2>
-                    <p className="text-sm text-red-700 text-center">
-                      El periodo de registro para el fotocheck ha finalizado. Gracias por su participacion.
-                    </p>
-                  </div>
-                )}
                 <h1 className="text-xl font-bold mb-1">
                   Registro de datos para Fotocheck
                 </h1>
@@ -333,7 +473,6 @@ export default function HomePage() {
                   son obligatorios.
                 </p>
 
-                <fieldset disabled={REGISTRO_CERRADO} className={REGISTRO_CERRADO ? "opacity-50 pointer-events-none" : ""}>
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* DNI - FIRST */}
                   <div className="space-y-2">
@@ -631,7 +770,6 @@ export default function HomePage() {
                     {saving ? "Enviando..." : dniExists ? "ACTUALIZAR FOTOCHECK" : "SUBIR ARCHIVO"}
                   </Button>
                 </form>
-                </fieldset>
               </CardContent>
             </Card>
           </div>
@@ -650,7 +788,7 @@ export default function HomePage() {
               />
             </div>
           </div>
-        </div>
+        </div>}
       </main>
 
       {/* Wave before footer */}
