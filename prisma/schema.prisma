@@ -24,6 +24,8 @@ model Employee {
   cardGenerated   Boolean  @default(false)
   cardPrinted     Boolean  @default(false)
   printedAt       DateTime?
+  cardDelivered   Boolean  @default(false)
+  deliveredAt     DateTime?
   observations    String   @default("")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

@@ -25,6 +25,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
+const REGISTRO_CERRADO = true; // Cambiar a false para reactivar el formulario
+
 export default function HomePage() {
   const [saving, setSaving] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -314,6 +316,15 @@ export default function HomePage() {
           <div className="flex-1">
             <Card>
               <CardContent className="p-6 sm:p-8">
+                {REGISTRO_CERRADO && (
+                  <div className="flex flex-col items-center gap-3 rounded-lg border border-red-300 bg-red-50 p-6 mb-6">
+                    <AlertTriangle className="w-8 h-8 text-red-600" />
+                    <h2 className="text-lg font-bold text-red-800">Registro Cerrado</h2>
+                    <p className="text-sm text-red-700 text-center">
+                      El periodo de registro para el fotocheck ha finalizado. Gracias por su participacion.
+                    </p>
+                  </div>
+                )}
                 <h1 className="text-xl font-bold mb-1">
                   Registro de datos para Fotocheck
                 </h1>
@@ -322,6 +333,7 @@ export default function HomePage() {
                   son obligatorios.
                 </p>
 
+                <fieldset disabled={REGISTRO_CERRADO} className={REGISTRO_CERRADO ? "opacity-50 pointer-events-none" : ""}>
                 <form onSubmit={handleSubmit} className="space-y-5">
                   {/* DNI - FIRST */}
                   <div className="space-y-2">
@@ -619,6 +631,7 @@ export default function HomePage() {
                     {saving ? "Enviando..." : dniExists ? "ACTUALIZAR FOTOCHECK" : "SUBIR ARCHIVO"}
                   </Button>
                 </form>
+                </fieldset>
               </CardContent>
             </Card>
           </div>
