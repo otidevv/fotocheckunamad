@@ -15,7 +15,10 @@ export async function GET(
       lastName: true,
       email: true,
       position: true,
+      oficina: true,
       cardGenerated: true,
+      cardPrinted: true,
+      cardDelivered: true,
     },
   });
 
