@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
-
 interface EmployeeResult {
   id: string;
   dni: string;
@@ -176,12 +174,10 @@ export default function EntregasPage() {
               {/* Foto */}
               <div className="shrink-0">
                 {employee.photoUrl ? (
-                  <Image
-                    src={employee.photoUrl}
+                  <img
+                    src={`${employee.photoUrl}${employee.photoUrl.includes('?') ? '&' : '?'}v=${employee.id}`}
                     alt="Foto"
-                    width={120}
-                    height={144}
-                    className="rounded-lg border object-cover"
+                    className="w-[120px] h-[144px] rounded-lg border object-cover"
                   />
                 ) : (
                   <div className="w-[120px] h-[144px] rounded-lg border bg-muted flex items-center justify-center">
