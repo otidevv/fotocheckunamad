@@ -355,18 +355,9 @@ export default function HomePage() {
 
       <main className="max-w-6xl mx-auto px-4 py-8 relative">
         {/* Consulta de estado de fotocheck */}
-        {REGISTRO_CERRADO && (
-          <div className="max-w-2xl mx-auto mb-8">
+        <div className="max-w-2xl mx-auto mb-8">
             <Card>
               <CardContent className="p-6 sm:p-8">
-                <div className="flex flex-col items-center gap-3 rounded-lg border border-red-300 bg-red-50 p-5 mb-6">
-                  <AlertTriangle className="w-8 h-8 text-red-600" />
-                  <h2 className="text-lg font-bold text-red-800">Registro Cerrado</h2>
-                  <p className="text-sm text-red-700 text-center">
-                    El periodo de registro para el fotocheck ha finalizado. Gracias por su participacion.
-                  </p>
-                </div>
-
                 <h1 className="text-xl font-bold mb-1 text-center">
                   Consultar Estado de Fotocheck
                 </h1>
@@ -459,7 +450,6 @@ export default function HomePage() {
               </CardContent>
             </Card>
           </div>
-        )}
 
         {!REGISTRO_CERRADO && <div className="flex flex-col lg:flex-row gap-8">
           {/* LEFT: Form */}
