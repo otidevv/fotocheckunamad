@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const REGISTRO_CERRADO = false; // Cambiar a true para cerrar el registro
+const REGISTRO_CERRADO = true; // Cambiar a true para cerrar el registro
 
 export default function HomePage() {
   const [saving, setSaving] = useState(false);
@@ -322,7 +322,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
       {/* Decorative background elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-brand/5 blur-3xl" />
@@ -353,7 +353,7 @@ export default function HomePage() {
         </svg>
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 py-8 relative">
+      <main className="max-w-6xl mx-auto px-4 py-8 relative flex-1">
         {/* Consulta de estado de fotocheck */}
         <div className="max-w-2xl mx-auto mb-8">
             <Card>
