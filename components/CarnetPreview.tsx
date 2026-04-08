@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -12,6 +12,7 @@ interface CarnetPreviewProps {
   oficina: string;
   email: string;
   photoUrl: string | null;
+  isLocacion?: boolean;
 }
 
 interface TemplateConfig {
@@ -28,7 +29,7 @@ interface TemplateConfig {
   };
 }
 
-export default function CarnetPreview(props: CarnetPreviewProps) {
+export default function CarnetPreview({ isLocacion = false, ...props }: CarnetPreviewProps) {
   const [config, setConfig] = useState<TemplateConfig | null>(null);
   const [hasTemplateFront, setHasTemplateFront] = useState(false);
   const [hasTemplateBack, setHasTemplateBack] = useState(false);
@@ -135,20 +136,18 @@ export default function CarnetPreview(props: CarnetPreviewProps) {
               {/* Fields with dynamic positioning */}
               {(() => {
                 let nextY = 0;
-                const fieldRefs: { key: string; lines: number; lineHeight: number; fontSize: number }[] = [];
-                return Object.entries(config.front.fields).map(([key, f]) => {
+                const elements: React.ReactNode[] = [];
+                Object.entries(config.front.fields).forEach(([key, f]) => {
                   const currentY = nextY > f.y * scale ? nextY : f.y * scale;
                   const fontSize = Math.max(f.fontSize * scale, 7);
                   const lineHeight = fontSize * 1.3;
                   const text = fieldValues[key] || "";
                   const maxW = (f.maxWidth || config.cardWidth - 100) * scale;
-                  // Estimate lines based on maxWidth
                   const avgCharW = fontSize * (f.fontWeight === "bold" ? 0.65 : 0.55);
                   const charsPerLine = Math.floor(maxW / avgCharW);
                   const estimatedLines = Math.max(1, Math.ceil(text.length / charsPerLine));
-                  fieldRefs.push({ key, lines: estimatedLines, lineHeight, fontSize });
                   nextY = currentY + estimatedLines * lineHeight + fontSize * 0.2;
-                  return (
+                  elements.push(
                     <div
                       key={key}
                       className="absolute text-center"
@@ -167,7 +166,31 @@ export default function CarnetPreview(props: CarnetPreviewProps) {
                       {text}
                     </div>
                   );
+                  // Inject LOCACIÓN right after the DNI field
+                  if (key === "dni" && isLocacion) {
+                    const locY = nextY;
+                    nextY += fontSize * 1.3 + fontSize * 0.2;
+                    elements.push(
+                      <div
+                        key="locacion-label"
+                        className="absolute text-center"
+                        style={{
+                          top: locY,
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                          width: maxW,
+                          fontSize,
+                          fontWeight: 700,
+                          color: f.color,
+                          lineHeight: 1.3,
+                        }}
+                      >
+                        LOCACIÓN
+                      </div>
+                    );
+                  }
                 });
+                return elements;
               })()}
             </div>
           </TabsContent>

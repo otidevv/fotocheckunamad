@@ -26,7 +26,8 @@
     "fields": {
       "email": { "x": "center", "y": 1340, "fontSize": 38, "color": "#FFFFFF", "maxWidth": 1300 },
       "validity": { "x": "center", "y": 1440, "fontSize": 38, "fontWeight": "bold", "color": "#FFFFFF", "maxWidth": 1300, "text": "VIGENCIA: 2026" },
-      "address": { "x": "center", "y": 1530, "fontSize": 32, "color": "#FFFFFF", "maxWidth": 1300, "text": "Av. Jorge Chávez 1160 - Puerto Maldonado" }
+      "address": { "x": "center", "y": 1530, "fontSize": 32, "color": "#FFFFFF", "maxWidth": 1300, "text": "Av. Jorge Chávez 1160 - Puerto Maldonado" },
+      "servicios": { "x": "center", "y": 1590, "fontSize": 40, "fontWeight": "bold", "color": "#FFFFFF", "maxWidth": 1300, "text": "SERVICIOS EVENTUALES" }
     },
     "qr": {
       "x": "center",

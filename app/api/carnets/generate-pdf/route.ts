@@ -69,7 +69,8 @@ function wrapText(ctx: ReturnType<ReturnType<typeof createCanvas>["getContext"]>
 async function generateSide(
   employee: EmployeeData,
   config: TemplateConfig,
-  side: "front" | "back"
+  side: "front" | "back",
+  isLocador: boolean = false
 ): Promise<Buffer> {
   const canvas = createCanvas(config.cardWidth, config.cardHeight);
   const ctx = canvas.getContext("2d");
@@ -141,6 +142,16 @@ async function generateSide(
         ctx.fillText(lines[l], textX, currentY + l * lineHeight);
       }
       nextY = currentY + lines.length * lineHeight + f.fontSize * 0.6;
+
+      // Dibujar "LOCACIÓN" inmediatamente después del campo DNI
+      if (key === "dni" && isLocador) {
+        const locadorFontSize = f.fontSize;
+        ctx.font = `bold ${locadorFontSize}px Arial`;
+        ctx.fillStyle = f.color;
+        ctx.textAlign = "center";
+        ctx.fillText("LOCACIÓN", config.cardWidth / 2, nextY);
+        nextY += locadorFontSize * 1.3 + locadorFontSize * 0.6;
+      }
     }
   } else {
     const tplPath = path.join(process.cwd(), "public", "templates", config.templateBack);
@@ -181,7 +192,7 @@ async function generateSide(
 
 export async function POST(req: NextRequest) {
   try {
-    const { employeeIds } = await req.json();
+    const { employeeIds, isLocador = false } = await req.json();
     const ids = Array.isArray(employeeIds) ? employeeIds : [employeeIds];
 
     const employees = await prisma.employee.findMany({ where: { id: { in: ids } } });
@@ -202,12 +213,12 @@ export async function POST(req: NextRequest) {
       if (i > 0) doc.addPage([cardWidthMM, cardHeightMM]);
 
       // Front page
-      const frontBuf = await generateSide(employees[i], config, "front");
+      const frontBuf = await generateSide(employees[i], config, "front", isLocador);
       doc.addImage(`data:image/png;base64,${frontBuf.toString("base64")}`, "PNG", 0, 0, cardWidthMM, cardHeightMM);
 
       // Back page
       doc.addPage([cardWidthMM, cardHeightMM]);
-      const backBuf = await generateSide(employees[i], config, "back");
+      const backBuf = await generateSide(employees[i], config, "back", isLocador);
       doc.addImage(`data:image/png;base64,${backBuf.toString("base64")}`, "PNG", 0, 0, cardWidthMM, cardHeightMM);
     }
 

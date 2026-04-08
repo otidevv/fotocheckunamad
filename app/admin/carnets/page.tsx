@@ -38,6 +38,7 @@ interface Employee {
   status: string;
   cardGenerated: boolean;
   observations: string;
+  isLocacion: boolean;
   createdAt: string;
 }
 
@@ -344,7 +345,7 @@ export default function CarnetsPage() {
                     <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{emp.position}</TableCell>
                     <TableCell className="text-muted-foreground text-xs max-w-[200px] truncate">{emp.oficina}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         {emp.cardGenerated ? (
                           <Badge
                             className="cursor-pointer bg-emerald-100 text-emerald-700 hover:bg-emerald-200 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800"
@@ -355,6 +356,11 @@ export default function CarnetsPage() {
                         ) : (
                           <Badge variant="outline" className="text-amber-600 border-amber-300 bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800">
                             Pendiente
+                          </Badge>
+                        )}
+                        {emp.isLocacion && (
+                          <Badge variant="outline" className="text-blue-600 border-blue-300 bg-blue-50 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 text-xs">
+                            Locación
                           </Badge>
                         )}
                         {emp.observations && (
@@ -508,6 +514,7 @@ export default function CarnetsPage() {
                 <div><span className="text-muted-foreground">Periodo:</span> {previewDialog.employee.year}</div>
                 <div><span className="text-muted-foreground">Registro:</span> {new Date(previewDialog.employee.createdAt).toLocaleDateString("es-PE")}</div>
                 <div><span className="text-muted-foreground">Estado:</span> {previewDialog.employee.status === "active" ? "Activo" : "Inactivo"}</div>
+                <div><span className="text-muted-foreground">Locación:</span> {previewDialog.employee.isLocacion ? "Sí" : "No"}</div>
               </div>
               {previewDialog.employee.observations && (
                 <div className="rounded-md bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 p-3 mt-2">

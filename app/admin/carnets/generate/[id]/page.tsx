@@ -25,6 +25,7 @@ interface Employee {
   cardPrinted: boolean;
   printedAt: string | null;
   observations: string;
+  isLocacion: boolean;
 }
 
 export default function GenerateCarnetPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,11 +38,12 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
   const [markingPrinted, setMarkingPrinted] = useState(false);
   const [obsText, setObsText] = useState("");
   const [savingObs, setSavingObs] = useState(false);
+  const [isLocador, setIsLocador] = useState(false);
 
   useEffect(() => {
     fetch(`/api/employees/${id}`)
       .then((r) => r.ok ? r.json() : Promise.reject())
-      .then((emp) => { setEmployee(emp); setObsText(emp.observations || ""); })
+      .then((emp) => { setEmployee(emp); setObsText(emp.observations || ""); setIsLocador(emp.isLocacion || false); })
       .catch(() => toast.error("Empleado no encontrado"))
       .finally(() => setLoading(false));
   }, [id]);
@@ -53,7 +55,7 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
       const frontRes = await fetch("/api/carnets/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeId: id, side: "front" }),
+        body: JSON.stringify({ employeeId: id, side: "front", isLocador }),
       });
       if (!frontRes.ok) throw new Error();
       const frontBlob = await frontRes.blob();
@@ -63,7 +65,7 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
       const backRes = await fetch("/api/carnets/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeId: id, side: "back" }),
+        body: JSON.stringify({ employeeId: id, side: "back", isLocador }),
       });
       if (!backRes.ok) throw new Error();
       const backBlob = await backRes.blob();
@@ -92,7 +94,7 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
       const res = await fetch("/api/carnets/generate-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ employeeIds: id }),
+        body: JSON.stringify({ employeeIds: id, isLocador }),
       });
       if (!res.ok) throw new Error();
       const blob = await res.blob();
@@ -193,6 +195,18 @@ export default function GenerateCarnetPage({ params }: { params: Promise<{ id: s
 
         {/* Sidebar actions */}
         <div className="lg:w-72 space-y-4">
+          <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/40">
+            <Checkbox
+              id="locador"
+              checked={isLocador}
+              onCheckedChange={(checked) => setIsLocador(!!checked)}
+            />
+            <Label htmlFor="locador" className="cursor-pointer text-sm font-medium leading-tight">
+              Locación de Servicios
+              <p className="text-xs text-muted-foreground font-normal">Agrega &quot;LOCACIÓN&quot; en el fotocheck</p>
+            </Label>
+          </div>
+
           <Button onClick={generateCarnet} disabled={generating} className="w-full gap-2" size="lg">
             {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
             {generating ? "Generando..." : frontUrl ? "Regenerar" : "Generar Fotocheck"}
