@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { ChevronsUpDown, Check } from "lucide-react";
 
 export default function NewCarnetPage() {
   const router = useRouter();
@@ -29,6 +32,7 @@ export default function NewCarnetPage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isLocacion, setIsLocacion] = useState(false);
+  const [oficinaOpen, setOficinaOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -171,17 +175,56 @@ export default function NewCarnetPage() {
 
                 <div className="space-y-2">
                   <Label>OFICINA / DEPENDENCIA</Label>
-                  <Select value={form.oficina} onValueChange={(val) => setForm((prev) => ({ ...prev, oficina: val }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar oficina..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {OFICINAS.map((ofi) => (
-                        <SelectItem key={ofi} value={ofi}>{ofi}</SelectItem>
-                      ))}
-                      <SelectItem value="__otro__">Otro (especificar)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Popover open={oficinaOpen} onOpenChange={setOficinaOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        role="combobox"
+                        aria-expanded={oficinaOpen}
+                        className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 text-left"
+                      >
+                        <span className={form.oficina ? "truncate" : "text-muted-foreground"}>
+                          {form.oficina
+                            ? (form.oficina === "__otro__" ? "Otro (especificar)" : form.oficina)
+                            : "Seleccionar oficina..."}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                      <Command>
+                        <CommandInput placeholder="Buscar oficina..." />
+                        <CommandList>
+                          <CommandEmpty>No se encontró ninguna oficina.</CommandEmpty>
+                          <CommandGroup>
+                            {OFICINAS.map((ofi) => (
+                              <CommandItem
+                                key={ofi}
+                                value={ofi}
+                                onSelect={(val) => {
+                                  setForm((prev) => ({ ...prev, oficina: val === form.oficina ? "" : val, customOficina: "" }));
+                                  setOficinaOpen(false);
+                                }}
+                              >
+                                <Check className={`mr-2 h-4 w-4 ${form.oficina === ofi ? "opacity-100" : "opacity-0"}`} />
+                                {ofi}
+                              </CommandItem>
+                            ))}
+                            <CommandItem
+                              value="__otro__"
+                              onSelect={() => {
+                                setForm((prev) => ({ ...prev, oficina: "__otro__", customOficina: "" }));
+                                setOficinaOpen(false);
+                              }}
+                            >
+                              <Check className={`mr-2 h-4 w-4 ${form.oficina === "__otro__" ? "opacity-100" : "opacity-0"}`} />
+                              Otro (especificar)
+                            </CommandItem>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   {form.oficina === "__otro__" && (
                     <Input name="customOficina" value={form.customOficina} onChange={handleChange} placeholder="Escriba la oficina..." className="mt-2 uppercase" />
                   )}
