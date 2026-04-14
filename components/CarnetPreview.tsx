@@ -216,20 +216,23 @@ export default function CarnetPreview({ isLocacion = false, ...props }: CarnetPr
               )}
 
               {/* Back fields */}
-              {Object.entries(config.back.fields).map(([key, f]) => (
-                <div
-                  key={key}
-                  className="absolute left-0 right-0 text-center px-3"
-                  style={{
-                    top: f.y * scale,
-                    fontSize: Math.max(f.fontSize * scale, 6),
-                    fontWeight: f.fontWeight === "bold" ? 700 : 400,
-                    color: f.color,
-                  }}
-                >
-                  {f.text || fieldValues[key] || ""}
-                </div>
-              ))}
+              {Object.entries(config.back.fields).map(([key, f]) => {
+                if (key === "servicios" && !isLocacion) return null;
+                return (
+                  <div
+                    key={key}
+                    className="absolute left-0 right-0 text-center px-3"
+                    style={{
+                      top: f.y * scale,
+                      fontSize: Math.max(f.fontSize * scale, 6),
+                      fontWeight: f.fontWeight === "bold" ? 700 : 400,
+                      color: f.color,
+                    }}
+                  >
+                    {f.text || fieldValues[key] || ""}
+                  </div>
+                );
+              })}
 
               {/* QR placeholder */}
               <div

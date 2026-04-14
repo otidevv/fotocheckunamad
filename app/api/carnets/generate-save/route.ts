@@ -157,6 +157,7 @@ export async function POST(req: NextRequest) {
 
     // Back text fields
     for (const [key, f] of Object.entries(config.back.fields)) {
+      if (key === "servicios" && !employee.isLocacion) continue;
       const value = f.text || fieldValues[key];
       if (!value) continue;
       const w = f.fontWeight === "bold" ? "bold " : "";
