@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   Command,
   CommandEmpty,
@@ -43,6 +44,7 @@ export default function HomePage() {
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isLocacion, setIsLocacion] = useState(false);
   const [openCombo, setOpenCombo] = useState(false);
   const [openOficinaCombo, setOpenOficinaCombo] = useState(false);
   const [dniExists, setDniExists] = useState(false);
@@ -111,6 +113,7 @@ export default function HomePage() {
         const existing = await checkRes.json();
         if (existing.exists) {
           setDniExists(true);
+          setIsLocacion(existing.employee.isLocacion || false);
           setForm((prev) => ({
             ...prev,
             firstName: existing.employee.firstName || prev.firstName,
@@ -207,6 +210,7 @@ export default function HomePage() {
           lastName: form.lastName,
           position: finalPosition,
           oficina: finalOficina,
+          isLocacion,
         }),
       });
       if (!empRes.ok) {
@@ -226,6 +230,7 @@ export default function HomePage() {
           lastName: form.lastName,
           position: finalPosition,
           oficina: finalOficina,
+          isLocacion,
           photoUrl,
           photoOriginal,
         }),
@@ -307,6 +312,7 @@ export default function HomePage() {
                   setSubmitted(false);
                   setDniExists(false);
                   setForm({ email: "", dni: "", firstName: "", lastName: "", position: "", customPosition: "", oficina: "", customOficina: "" });
+                  setIsLocacion(false);
                   setPhotoFile(null);
                   setPhotoPreview(null);
                 }}
@@ -700,6 +706,25 @@ export default function HomePage() {
                     )}
                   </div>
 
+                  {/* Locación de servicios */}
+                  <label
+                    htmlFor="isLocacion"
+                    className={`flex items-center justify-between rounded-lg border-2 px-4 py-3 cursor-pointer transition-colors ${
+                      isLocacion
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-400"
+                        : "border-border bg-muted/30"
+                    }`}
+                  >
+                    <span className={`font-semibold text-sm ${isLocacion ? "text-blue-700 dark:text-blue-300" : "text-foreground"}`}>
+                      ¿ES LOCACIÓN DE SERVICIOS?
+                    </span>
+                    <Switch
+                      id="isLocacion"
+                      checked={isLocacion}
+                      onCheckedChange={setIsLocacion}
+                    />
+                  </label>
+
                   {/* Photo */}
                   <div className="space-y-2">
                     <Label>
@@ -803,6 +828,7 @@ export default function HomePage() {
                 oficina={finalOficina}
                 email={form.email}
                 photoUrl={photoPreview}
+                isLocacion={isLocacion}
               />
             </div>
           </div>

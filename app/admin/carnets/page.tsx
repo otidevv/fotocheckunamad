@@ -91,6 +91,8 @@ export default function CarnetsPage() {
     }
   }, [search, statusFilter, carnetFilter, oficinaFilter, orderBy, dateFrom, dateTo, page, limit]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   useEffect(() => { fetchEmployees(); }, [fetchEmployees]);
 
   const handleDelete = async () => {
@@ -193,6 +195,8 @@ export default function CarnetsPage() {
       {/* Filters */}
       <Card className="mb-4">
         <CardContent className="p-4 space-y-3">
+          {!mounted && <div className="h-[120px]" />}
+          {mounted && <>
           {/* Row 1: Search + Status + Carnet */}
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
@@ -281,6 +285,7 @@ export default function CarnetsPage() {
               </Button>
             )}
           </div>
+          </>}
         </CardContent>
       </Card>
 

@@ -231,27 +231,23 @@ export default function NewCarnetPage() {
                   )}
                 </div>
 
-                <div
+                <label
+                  htmlFor="isLocacion"
                   className={`flex items-center justify-between rounded-lg border-2 px-4 py-3 cursor-pointer transition-colors ${
                     isLocacion
                       ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-400"
                       : "border-border bg-muted/30"
                   }`}
-                  onClick={() => setIsLocacion(!isLocacion)}
                 >
-                  <Label
-                    htmlFor="isLocacion"
-                    className={`cursor-pointer font-semibold ${isLocacion ? "text-blue-700 dark:text-blue-300" : "text-foreground"}`}
-                  >
+                  <span className={`font-semibold text-sm ${isLocacion ? "text-blue-700 dark:text-blue-300" : "text-foreground"}`}>
                     ¿ES LOCACIÓN DE SERVICIOS?
-                  </Label>
+                  </span>
                   <Switch
                     id="isLocacion"
                     checked={isLocacion}
                     onCheckedChange={setIsLocacion}
-                    onClick={(e) => e.stopPropagation()}
                   />
-                </div>
+                </label>
 
                 <div className="space-y-2">
                   <Label>FOTO *</Label>
