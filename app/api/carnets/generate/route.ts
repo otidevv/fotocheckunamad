@@ -55,7 +55,7 @@ function wrapText(ctx: ReturnType<ReturnType<typeof createCanvas>["getContext"]>
 
 export async function POST(req: NextRequest) {
   try {
-    const { employeeId, side = "front" } = await req.json();
+    const { employeeId, side = "front", isLocador = false } = await req.json();
 
     const employee = await prisma.employee.findUnique({ where: { id: employeeId } });
     if (!employee) {
@@ -165,6 +165,16 @@ export async function POST(req: NextRequest) {
         }
         // Gap proportional to font size: more space after larger text
         nextY = currentY + lines.length * lineHeight + f.fontSize * 0.6;
+
+        // Dibujar "LOCACIÓN" inmediatamente después del campo DNI
+        if (key === "dni" && isLocador) {
+          const locadorFontSize = f.fontSize;
+          ctx.font = `bold ${locadorFontSize}px Arial`;
+          ctx.fillStyle = f.color;
+          ctx.textAlign = "center";
+          ctx.fillText("LOCACIÓN", config.cardWidth / 2, nextY);
+          nextY += locadorFontSize * 1.3 + locadorFontSize * 0.6;
+        }
       }
     } else {
       // --- BACK ---
@@ -196,6 +206,7 @@ export async function POST(req: NextRequest) {
 
       // Back text fields
       for (const [key, f] of Object.entries(config.back.fields)) {
+        if (key === "servicios" && !isLocador) continue;
         const value = f.text || fieldValues[key];
         if (!value) continue;
         const weight = f.fontWeight === "bold" ? "bold " : "";

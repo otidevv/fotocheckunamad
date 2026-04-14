@@ -12,6 +12,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { ChevronsUpDown, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 export default function NewCarnetPage() {
   const router = useRouter();
@@ -27,6 +31,8 @@ export default function NewCarnetPage() {
   });
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [isLocacion, setIsLocacion] = useState(false);
+  const [oficinaOpen, setOficinaOpen] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -182,6 +188,24 @@ export default function NewCarnetPage() {
                   </Select>
                 </div>
 
+                <label
+                  htmlFor="isLocacion"
+                  className={`flex items-center justify-between rounded-lg border-2 px-4 py-3 cursor-pointer transition-colors ${
+                    isLocacion
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-400"
+                      : "border-border bg-muted/30"
+                  }`}
+                >
+                  <span className={`font-semibold text-sm ${isLocacion ? "text-blue-700 dark:text-blue-300" : "text-foreground"}`}>
+                    ¿ES LOCACIÓN DE SERVICIOS?
+                  </span>
+                  <Switch
+                    id="isLocacion"
+                    checked={isLocacion}
+                    onCheckedChange={setIsLocacion}
+                  />
+                </label>
+
                 <div className="space-y-2">
                   <Label>FOTO *</Label>
                   <PhotoUpload onPhotoReady={(file, url) => { setPhotoFile(file); setPhotoPreview(url); }} />
@@ -207,6 +231,7 @@ export default function NewCarnetPage() {
               oficina={form.oficina}
               email={form.email}
               photoUrl={photoPreview}
+              isLocacion={isLocacion}
             />
           </div>
         </div>

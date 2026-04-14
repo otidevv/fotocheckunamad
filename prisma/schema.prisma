@@ -27,6 +27,7 @@ model Employee {
   cardDelivered   Boolean  @default(false)
   deliveredAt     DateTime?
   observations    String   @default("")
+  isLocacion      Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
