@@ -26,7 +26,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-const REGISTRO_CERRADO = false; // Cambiar a true para cerrar el registro
+const REGISTRO_CERRADO = false; // Cambiar a true para cerrar el registrooo
 
 export default function HomePage() {
   const [saving, setSaving] = useState(false);
